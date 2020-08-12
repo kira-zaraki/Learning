@@ -1,0 +1,18 @@
+{% extends 'main.html' %}
+
+{% block Content %}
+
+    <section class="section_gap">
+        <div class="container">
+            <form action="" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                {{ form }}
+                <br>
+                <br>
+                  <button class="click-btn btn btn-default">
+                    <span>Submite</span>
+                  </button>
+            </form>
+        </div>
+    </section>
+{% endblock %}

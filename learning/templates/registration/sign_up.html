@@ -1,0 +1,34 @@
+{% extends 'main.html' %}
+
+
+{% block Content %}
+    <section class="section_gap">
+        <div class="container">
+            <form action="" method="POST">
+                {% csrf_token %}
+                <div class="mt-10">
+                    {{ form.username }}
+                </div>
+                <div class="mt-10">
+                    {{ form.email }}
+                </div>
+                <div class="mt-10">
+                    {{ form.password1 }}
+                </div>
+                <div class="mt-10">
+                    {{ form.password2 }}
+                </div>
+{#                <div class="mt-10">#}
+{#                    <input type="text" name="password" placeholder="First Name" onfocus="this.placeholder = ''" onblur="this.placeholder = 'First Name'"#}
+{#                     required class="single-input">#}
+{#                </div>#}
+                <br>
+                <br>
+                  <button class="click-btn btn btn-default">
+                    <span>subscribe</span>
+                  </button>
+            </form>
+        </div>
+    </section>
+
+{% endblock %}

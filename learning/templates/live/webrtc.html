@@ -1,0 +1,186 @@
+<video id="localVideo" autoplay playsinline></video>
+<video id="remoteVideo" autoplay playsinline></video>
+
+
+<div>
+  <button id="startButton">Start</button>
+  <button id="callButton">Call</button>
+  <button id="hangupButton">Hang Up</button>
+</div>
+
+
+<script>
+    let localStream
+    let localPeerConnection
+
+    const offerOptions = {
+      offerToReceiveAudio: 1,
+      offerToReceiveVideo: 1
+    };
+    const remoteVideo = document.getElementById('remoteVideo');
+    {#localPeerConnection = new RTCPeerConnection(null)#}
+    {#localPeerConnection.addEventListener('icecandidate', handleConnection)#}
+    {#localPeerConnection.addEventListener('iceconnectionstatechange',handleConnectionChange)#}
+    document.getElementById('startButton').addEventListener('click', start)
+    document.getElementById('callButton').addEventListener('click', call)
+
+
+    async function start() {
+      console.log('Requesting local stream');
+      startButton.disabled = true;
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({audio: false, video: true});
+        console.log('Received local stream');
+        localVideo.srcObject = stream;
+        localStream = stream;
+        callButton.disabled = false;
+      } catch (e) {
+        alert(`getUserMedia() error: ${e.name}`);
+      }
+    }
+
+    console.log(localStream)
+
+
+function getSelectedSdpSemantics(){
+    const sdpSemanticsSelect = document.querySelector('')
+}
+
+
+async function call(){
+    {#const videoTrack = localStream.getVideoTracks()#}
+    const audioTrack = localStream.getAudioTracks()
+
+    const configuration = {iceServers: [{urls: 'stun:stun1.l.google.com:19302'}]}
+    pc1 = new RTCPeerConnection(configuration)
+    pc2 = new RTCPeerConnection(configuration)
+
+    pc2.addEventListener('icecandidate', e => onIceCandidate(pc2, e))
+    pc1.addEventListener('icecandidate', e => onIceCandidate(pc1, e))
+
+    {#pc2.addEventListener('iceconnectionstatechange', e => onIceStateChange(pc2, e))#}
+    {#pc1.addEventListener('iceconnectionstatechange', e => onIceStateChange(pc1, e))#}
+
+    pc2.addEventListener('track', gotRemoteStream)
+    localStream.getTracks().forEach(track => pc1.addTrack(track, localStream))
+
+    const offer = await pc1.createOffer(offerOptions)
+    await onCreateOfferSuccess(offer)
+    {% comment %}await pc1.setLocalDescription(offer)
+    onsetLocalSuccess(pc1)
+
+    const answer = await pc21.createOffer(offerOptions)
+    await pc2.setLocalDescription(answer)
+    onsetLocalSuccess(pc2){% endcomment %}
+}
+
+async function onCreateOfferSuccess(desc) {
+    try {
+        await pc1.setLocalDescription(desc)
+    }catch(e){
+        onCreateSessionDescriptionError(e);
+    }
+
+    try {
+        await pc2.setRemoteDescription(desc)
+    }catch(e){
+        onCreateSessionDescriptionError(e);
+    }
+    const answer = await pc2.createAnswer()
+
+    await onCreateAnswerSuccess(answer)
+}
+
+
+async function onCreateAnswerSuccess(desc){
+    try {
+        await pc2.setLocalDescription(desc)
+    }catch(e){
+        onCreateSessionDescriptionError(e);
+    }
+
+    try {
+        await pc1.setRemoteDescription(desc)
+    }catch(e){
+        onCreateSessionDescriptionError(e);
+    }
+
+}
+
+async function onIceCandidate(pc, event) {
+        console.log(pc)
+        await ((pc === pc1) ? pc2 : pc1).addIceCandidate(event.candidate)
+}
+
+function onCreateSessionDescriptionError(error) {
+  console.log(`Failed to create session description: ${error.toString()}`);
+}
+
+function gotRemoteStream(e){
+        console.log(e)
+        remoteVideo.srcObject = e.streams[0]
+}
+   {% comment %} navigator.mediaDevices.getUserMedia({video: true, audio: false})
+    .then(gotLocalMediaStream)
+    {#.catch(handleLocalMediaStreamError)#}
+    function gotLocalMediaStream(mediaStream){
+        document.getElementById('localVideo').srcObject = mediaStream
+        localStream = mediaStream
+    }
+    console.log(localStream)
+    localPeerConnection.addStream(localStream)
+
+    function handleConnection(e){
+        const peerConnection = e.target
+        const iceCandidate = e.candidate
+
+        if(iceCandidate){
+            const newIceCandidate = new RTCIceCandidate(iceCandidate)
+            const otherPeer = getOtherPeer(peerConnection)
+
+            otherPeer.addIceCandidate(newIceCandidate)
+            .then(() => {
+                handleConnectionSuccess(peerConnection)
+            })
+            .catch(error => {
+                handelConnectionFailure(peerConnection, error)
+            })
+        }
+
+    }
+
+    locationPeerConnection.createOffer(offreOptions)
+    .then(createOffer).catch(serSessoinDescriptionError)
+
+    function createdOffrer(description){
+        localPeerConnection.setLocalDescription(description)
+        .then(() => {
+            setLocalDescriptionSuccess(localPeerConnection)
+        })
+        .catch(setSessionDFescriptionError)
+
+        remotePeerConnection.setRemoteDescription(description)
+        .then(() => {
+            setRemoteDescriptionSeccess(remotePeerConnection)
+        })
+        .catch(setSessionDescriptionError)
+
+        remotePeerConnection.createAnswer()
+        .then(createAnswer)
+        .catch(setSessionDescriptionError)
+    }
+
+    function createdAnswer(description) {
+        remotePeerConnection.setLocalDescription(description)
+        .then(() => {
+            setLocalDescriptionSuccess(remotePeerConnection)
+        })
+        .catch(setSessionDescriptionError)
+
+        LocalPeerConnection.setLocalDescription(description)
+        .then(() => {
+            setRemoteDescriptionSuccess(localPeerConnection)
+        })
+        .catch(setSessionDescriptionError)
+    }{% endcomment %}
+</script>
